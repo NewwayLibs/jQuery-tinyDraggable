@@ -10,13 +10,13 @@
 
     $.fn.tinyDraggable = function (options) {
         var defaults = {
-            handle: 0,
-            exclude: 0,
-            allowXDrag:true,
-            allowYDrag:true,
-            start: null,
-            step: null,
-            finish: null
+            handle    : 0,
+            exclude   : 0,
+            allowXDrag: true,
+            allowYDrag: true,
+            start     : null,
+            step      : null,
+            finish    : null
         };
         var settings = $.extend(defaults, options);
 
@@ -44,11 +44,20 @@
                         var top = (settings.allowYDrag) ? (e.pageY - dy) : (os.top);
                         var left = (settings.allowXDrag) ? (e.pageX - dx) : (os.left);
 
-                        el.offset({top: top, left: left});
 
-                        if (typeof( settings.step ) == 'function') {
-                            settings.step(el, top, left);
+                        try {
+
+                            if (typeof( settings.step ) == 'function') {
+                                settings.step(el, top, left);
+                            }
+
+                            el.offset({top: top, left: left});
+
+                        } catch (e) {
+                            console.log('step exception');
+                            $(document).off('mousemove.drag');
                         }
+
 
                     });
                 },
