@@ -105,11 +105,32 @@ $(selector).tinyDraggable({key1: value1, key2: value2});
             <tr><th>Property</th><th>Default</th><th>Description</th></tr>
             <tr><td>handle</td><td>null</td><td>jQuery selector for all elements serving as grab handle.</td></tr>
             <tr><td>exclude</td><td>null</td><td>jQuery selector for elements that must not trigger the dragging event.</td></tr>
+            <tr><td>allowXDrag</td><td>true</td><td>Allow dragging by X .</td></tr>
+            <tr><td>allowYDrag</td><td>true</td><td>Allow dragging by Y .</td></tr>
+            <tr><td>start</td><td>null</td><td>onStart callback.</td></tr>
+            <tr><td>step</td><td>null</td><td>On each step callback.</td></tr>
+            <tr><td>finish</td><td>null</td><td>onFinish callback.</td></tr>
         </table>
 
         <h3 style="margin-top:.8em;border-top:1px solid #eee;padding-top:1.8em">Demo Source Code</h3>
         <pre>
-$(<b>'#item1'</b>).tinyDraggable();
+$(<b>'#item1'</b>).tinyDraggable(
+    {
+        allowXDrag:true,
+        allowYDrag:false,
+        start: function(target, top, left){
+            console.log('start');
+            console.log('top: ' + top + '; left: ' + left);
+        },
+        step: function(top, left){
+            // console.log('step');
+        },
+        finish: function(top, left){
+            console.log('finish');
+            console.log('top: ' + top + '; left: ' + left);
+        }
+    }
+);
 $(<b>'#item2'</b>).tinyDraggable({ handle: <b>'.handle'</b> });
 $(<b>'#item3'</b>).tinyDraggable({ exclude: <b>'.exclude_me, input'</b> });</pre>
 
@@ -144,7 +165,21 @@ $(<b>'#item3'</b>).tinyDraggable({ exclude: <b>'.exclude_me, input'</b> });</pre
     <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="jquery.tiny-draggable.js"></script>
     <script>
-        $('#item1').tinyDraggable();
+        $('#item1').tinyDraggable({
+            allowXDrag:true,
+            allowYDrag:false,
+            start: function(target, top, left){
+                console.log(target);
+                console.log('top: ' + top + '; left: ' + left);
+            },
+            step: function(){
+//                console.log('step');
+            },
+            finish: function(top, left){
+                console.log('finish');
+                console.log('top: ' + top + '; left: ' + left);
+            }
+        });
         $('#item2').tinyDraggable({ handle: '.handle' });
         $('#item3').tinyDraggable({ exclude: '.exclude_me, input' });
 
