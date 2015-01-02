@@ -20,60 +20,72 @@
         };
         var settings = $.extend(defaults, options);
 
+
+
         return this.each(function () {
             var dx, dy, el = $(this), handle = settings.handle ? $(settings.handle, el) : el;
-            handle.on({
-                mousedown: function (e) {
 
-                    if (settings.exclude && ~$.inArray(e.target, $(settings.exclude, el))) return;
 
-                    e.preventDefault();
+            handle.bind('vmousedown mousedown touchstart', function (e) {
+                if (settings.exclude && ~$.inArray(e.target, $(settings.exclude, el))) return;
 
+                e.preventDefault();
+
+                var os = el.offset();
+
+                // start hook
+                if (typeof( settings.start ) == 'function') {
+                    settings.start(el, os.top, os.left);
+                }
+
+
+                var gPageY = (e.originalEvent.touches) ? e.originalEvent.touches[0].pageY : e.pageY;
+                var gPageX = (e.originalEvent.touches) ? e.originalEvent.touches[0].pageX : e.pageX;
+
+                dx = gPageX - os.left, dy = gPageY - os.top;
+
+                $(document).on('mousemove.drag touchmove', function (e) {
+
+
+                    var pageY = (e.originalEvent.touches) ? e.originalEvent.touches[0].pageY : e.pageY;
+                    var pageX = (e.originalEvent.touches) ? e.originalEvent.touches[0].pageX : e.pageX;
+
+                    var top = (settings.allowYDrag) ? (pageY - dy) : (os.top);
+                    var left = (settings.allowXDrag) ? (pageX - dx) : (os.left);
+
+
+
+                    try {
+
+                        if (typeof( settings.step ) == 'function') {
+                            settings.step(el, top, left);
+                        }
+
+                        el.offset({top: top, left: left});
+
+                    } catch (e) {
+                        console.log('step exception');
+                        $(document).off('mousemove.drag touchmove');
+                    }
+
+
+                });
+            });
+
+            handle.bind('vmouseup mouseup touchend', function (e) {
+
+                $(document).off('mousemove.drag touchmove');
+
+                // stop hook
+                if (typeof( settings.finish ) == 'function') {
 
                     var os = el.offset();
 
-                    // start hook
-                    if (typeof( settings.start ) == 'function') {
-                        settings.start(el, os.top, os.left);
-                    }
-
-                    dx = e.pageX - os.left, dy = e.pageY - os.top;
-
-                    $(document).on('mousemove.drag', function (e) {
-
-                        var top = (settings.allowYDrag) ? (e.pageY - dy) : (os.top);
-                        var left = (settings.allowXDrag) ? (e.pageX - dx) : (os.left);
-
-
-                        try {
-
-                            if (typeof( settings.step ) == 'function') {
-                                settings.step(el, top, left);
-                            }
-
-                            el.offset({top: top, left: left});
-
-                        } catch (e) {
-                            console.log('step exception');
-                            $(document).off('mousemove.drag');
-                        }
-
-
-                    });
-                },
-                mouseup  : function (e) {
-
-                    $(document).off('mousemove.drag');
-
-                    // stop hook
-                    if (typeof( settings.finish ) == 'function') {
-
-                        var os = el.offset();
-
-                        settings.finish(el, os.top, os.left);
-                    }
+                    settings.finish(el, os.top, os.left);
                 }
             });
+
+
         });
     }
 }(jQuery));
